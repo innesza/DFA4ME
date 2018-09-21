@@ -20,6 +20,7 @@ class State {
 
     public State(String _name){
         name = _name;
+        transitions = new ArrayList<Transition>();
     }
 }
 
@@ -42,26 +43,37 @@ class DFA {
                 if(states.get(i).name.equals(finalStates[j]))
                     states.get(i).isAccepting = true;
             }
-        //Setting the start state
-        if(states.get(i).name.equals(startName))
-            start = states.get(i);
+            //Setting the start state
+            if(states.get(i).name.equals(startName))
+                start = states.get(i);
         }
     }
 
+    //Transitions in the form of state1:symbol:state2
     public void SetTransition(String s){
         String[] parsed = s.split(":", 3);
         State transStart = null, transEnd = null;
-        for(int k = 0; k < states.size()-1; k++){
-            if(states.get(k).equals(parsed[0]))
+        for(int k = 0; k < states.size(); k++){
+            if(states.get(k).name.equals(parsed[0]))
                 transStart = states.get(k);
-            if(states.get(k).equals(parsed[2]))
+            if(states.get(k).name.equals(parsed[2]))
                 transEnd = states.get(k);
         }
         transStart.transitions.add(new Transition(parsed[1], transEnd));
     }
 
-    public boolean TestString () {
-        return false;
+    public boolean TestString (String s, State current) {
+        if(s.length() == 0) {
+            return current.isAccepting;
+        } else {
+            int l;
+            for (l = 0; l < current.transitions.size(); l++){
+                if(s.startsWith(current.transitions.get(l).symbol))
+                    break;
+            }
+            return TestString(s.substring(1), current.transitions.get(l).tranState);
+        }
+
     }
 }
 
@@ -78,6 +90,8 @@ public class Main {
             String startState = s.nextLine(); //Holds the name of the start state
             String[] finalStates = s.nextLine().split(","); //Holds the names of the final states
             dfa = new DFA(alphabet, stateNames,startState, finalStates);
+            while(s.hasNextLine())
+                dfa.SetTransition(s.nextLine());
             s.close();
             in.close();
         } catch (Exception e) {
