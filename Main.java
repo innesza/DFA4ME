@@ -73,7 +73,6 @@ class DFA {
             }
             return TestString(s.substring(1), current.transitions.get(l).tranState);
         }
-
     }
 }
 
@@ -92,6 +91,18 @@ public class Main {
             dfa = new DFA(alphabet, stateNames,startState, finalStates);
             while(s.hasNextLine())
                 dfa.SetTransition(s.nextLine());
+            s.close();
+            in.close();
+            file = new File (args[1]);
+            in = new FileInputStream(file);
+            s = new Scanner(in);
+            while(s.hasNextLine()){
+                String temp = s.nextLine();
+                if(dfa.TestString(temp, dfa.start))
+                    System.out.println(temp + ": Accepted");
+                else
+                    System.out.println(temp + ": Declined");
+            }
             s.close();
             in.close();
         } catch (Exception e) {
