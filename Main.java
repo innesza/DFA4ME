@@ -49,7 +49,9 @@ class DFA {
         }
     }
 
-    //Transitions in the form of state1:symbol:state2
+    //Sets a transition
+    //Input: Transitional statement of the form state1:symbol:state2
+    //Output: N/A
     public void SetTransition(String s){
         String[] parsed = s.split(":", 3);
         State transStart = null, transEnd = null;
@@ -62,6 +64,9 @@ class DFA {
         transStart.transitions.add(new Transition(parsed[1], transEnd));
     }
 
+    //Tests a string to see if it is accepted by the dfa
+    //Input: String to be tested and the current state the dfa is in
+    //Output: True if the string is accepted, false otherwise
     public boolean TestString (String s, State current) {
         if(s.length() == 0) {
             return current.isAccepting;
@@ -74,13 +79,20 @@ class DFA {
             return TestString(s.substring(1), current.transitions.get(l).tranState);
         }
     }
+
+    //Makes a regular expression from a dfa; NOTE: This will destroy the dfa in the process!
+    //Input: End state of the dfa
+    //Output: A String Regex which is the regex for strings from the start to the given end state
+    public String MakeOneRegEx (State end) {
+        return null;
+    }
 }
 
 
 public class Main {
     public static void main (String[] args){
         File file = new File(args[0]);
-        DFA dfa;
+        DFA dfa, regexDFA;
         try {
             FileInputStream in = new FileInputStream(file);
             Scanner s = new Scanner(in);
@@ -88,7 +100,8 @@ public class Main {
             String[] stateNames = s.nextLine().split(","); //Holds names of states
             String startState = s.nextLine(); //Holds the name of the start state
             String[] finalStates = s.nextLine().split(","); //Holds the names of the final states
-            dfa = new DFA(alphabet, stateNames,startState, finalStates);
+            dfa = new DFA(alphabet, stateNames, startState, finalStates);
+            //Setting all transitions
             while(s.hasNextLine())
                 dfa.SetTransition(s.nextLine());
             s.close();
@@ -96,6 +109,7 @@ public class Main {
             file = new File (args[1]);
             in = new FileInputStream(file);
             s = new Scanner(in);
+            //Testing each string
             while(s.hasNextLine()){
                 String temp = s.nextLine();
                 if(dfa.TestString(temp, dfa.start))
@@ -103,6 +117,10 @@ public class Main {
                 else
                     System.out.println(temp + ": Declined");
             }
+            //Finding the regex for the given dfa
+            /*for(int i = 0; i < dfa.states.size(); i++){
+                regexDFA = dfa;
+            }*/
             s.close();
             in.close();
         } catch (Exception e) {
